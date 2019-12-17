@@ -9,7 +9,7 @@
     "typescript": "^3.7.3"
   },
   "scripts": {
-    "build1": "tsc Echo-Simple/src/Echo-Simple.ts --outFile Echo-Simple/dist/Echo-Simple.js --sourceMap true",
+    "build1": "tsc Echo-Simple/src/Echo-Simple.ts --outFile Echo-Simple/dist/Echo-Simple.js --sourceMap true --typeRoots Echo-Simple/@types",
     "build": "npm run build1"
   },
   "repository": {

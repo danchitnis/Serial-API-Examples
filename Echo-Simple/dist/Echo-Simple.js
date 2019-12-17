@@ -5,6 +5,7 @@
  * December 2019
  *
  * Please upload the sketch before running this code
+ * chrome://flags/#enable-experimental-web-platform-features
  */
 var LED = false;
 var decod = new TextDecoder();
