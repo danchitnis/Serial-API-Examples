@@ -1,27 +1,24 @@
 {
-  "name": "arduino-web-examples",
+  "name": "serial-api-examples",
   "version": "0.0.1",
   "description": "Using the IMU 9-axis sensor to plot on webgl-plot",
   "main": "index.js",
-  "dependencies": {
-    "@types/w3c-web-usb": "^1.0.3",
-    "@types/web-bluetooth": "0.0.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "tslint": "^5.20.1",
     "typescript": "^3.7.3"
   },
   "scripts": {
-    "build2": "tsc USB\\src\\WebUSB.ts --outFile USB\\dist\\WebUSB.js --sourceMap true"
+    "build1": "tsc Echo-Simple/src/Echo-Simple.ts --outFile Echo-Simple/dist/Echo-Simple.js --sourceMap true"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danchitnis/arduino-web-examples.git"
+    "url": "git+https://github.com/danchitnis/Serial-API-Examples.git"
   },
   "author": "Danial Chitnis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/danchitnis/Arduino-BLE-wegl-plot/issues"
+    "url": "https://github.com/danchitnis/Serial-API-Examples/issues"
   },
-  "homepage": "https://github.com/danchitnis/Arduino-BLE-wegl-plot#readme"
+  "homepage": "https://github.com/danchitnis/Serial-API-Examples#readme"
 }
