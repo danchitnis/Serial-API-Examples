@@ -9,8 +9,9 @@
     "typescript": "^3.7.3"
   },
   "scripts": {
-    "build1": "tsc Echo-Simple/src/Echo-Simple.ts --outFile Echo-Simple/dist/Echo-Simple.js --sourceMap true --typeRoots Echo-Simple/@types",
-    "build": "npm run build1"
+    "build1": "tsc Counter/src/Counter.ts --outFile Counter/dist/Counter.js --sourceMap true --typeRoots @types",
+    "build": "npm run build1",
+    "ver": "tsc --version"
   },
   "repository": {
     "type": "git",

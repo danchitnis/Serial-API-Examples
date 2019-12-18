@@ -5,11 +5,10 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.3
 
-type Serialrate = 9600 | 11500;
-type USBEndpointType = "bulk" | "interrupt" | "isochronous";
-type USBRequestType = "standard" | "class" | "vendor";
-type USBRecipient = "device" | "interface" | "endpoint" | "other";
-type USBTransferStatus = "ok" | "stall" | "babble";
+type Baudrate = 115200 | 57600 | 38400 | 19200 | 9600;
+type Databits = 8 | 7 | 6 | 5;
+type Stopbits = 1 | 2;
+type Parity = "none" | "even" | "odd" | "mark" | "space";
 
 
 
@@ -27,10 +26,10 @@ interface SerialPortInfo {
 }
 
 interface SerialOptions {
-    baudrate?: Serialrate;
-    databits?: number;
-    stopbits?: number;
-    parity?: String;
+    baudrate?: Baudrate;
+    databits?: Databits;
+    stopbits?: Stopbits;
+    parity?: Parity;
     buffersize?: number;
     rtscts?: number;
     xon?: Boolean;
@@ -62,17 +61,12 @@ declare class Serial extends EventTarget {
 }
 
 declare class SerialPort {
-    //Promise<void> open(optional SerialOptions options);
-    
-    //SerialPortInfo getInfo();
 
     readonly readable: ReadableStream;
     readonly writable: WritableStream;
     
-    
-    open(): Promise<void>;
-    open(options: SerialOptions): Promise<void>;
-    getInfo(): SerialPortInfo;
+    open(options?: SerialOptions): Promise<void>;
+    // getInfo(): SerialPortInfo;
     close(): void;
     
 }

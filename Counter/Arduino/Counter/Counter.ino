@@ -14,8 +14,6 @@
   This example code is in the public domain.
 */
 
-#include <Arduino_LSM9DS1.h>
-
 unsigned char counter = 0;
 
 void setup() {
