@@ -26,7 +26,10 @@ void setup() {
 
 void loop() {
   
-  Serial.println(counter);
+  if (counter<5) {
+    Serial.println(counter);
+  }
+  
   counter++;
   wait_ms(1000);
 }

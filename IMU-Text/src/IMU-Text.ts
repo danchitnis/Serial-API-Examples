@@ -25,13 +25,13 @@
 
  btConnect.addEventListener("click", () => {
 
-    // not implemnetd yet
-    /*navigator.serial.getPorts().then( (serialPorts) => {
-        console.log(serialPorts);
-    });*/
+    // required for some reason, otherwise the port gets closed on the first attempt
+    navigator.serial.getPorts().then( (serialPorts) => {
+        //console.log(serialPorts);
+    });
 
     navigator.serial.requestPort().then( (serialPort) => {
-        serialPort.open({baudrate: 9600}).then( () => {
+        serialPort.open({baudrate: 9600}).then(function open() {
 
             log("Connected...");
 
@@ -39,15 +39,24 @@
 
             reader.read().then(function procdata({done, value}): Promise<string> {
                 if (done) {
+                    console.log("here4");
                     return;
                 }
                 msgRX = msgRX + decod.decode(value);
 
-                // replace \r\n witch <br> for HTML display
-                pLog.innerHTML = msgRX.replace(/(?:\r\n|\r|\n)/g, "<br>");
+                // bug !!!!!
+                //sleep(100);
+                
 
+                // replace \r\n witch <br> for HTML display
+                const strDisplay = msgRX.replace(/(?:\r\n|\r|\n)/g, "<br>");
+                pLog.innerHTML = strDisplay.replace(/(?:\t)/g, "&nbsp&nbsp");
+                
+                
                 if (!stopRead) {
                     return reader.read().then(procdata);
+                    
+                    
                 } else {
                     reader.cancel().then( () => {
                         serialPort.close();
@@ -57,9 +66,16 @@
                     });
                     return;
                 }
+            }, () => {
+                console.log("here5");
             });
+            console.log("here1");
+            
         });
+        console.log("here2");
     });
+    console.log("here3");
+    return;
 
  });
 
@@ -76,3 +92,11 @@
  }
 
 }
+
+function sleep(milliseconds: number): void {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }

@@ -22,7 +22,7 @@ interface SerialPortFilter {
 }
 
 interface SerialPortInfo {
-    maplike: String;
+    maplike: string;
 }
 
 interface SerialOptions {
@@ -32,9 +32,9 @@ interface SerialOptions {
     parity?: Parity;
     buffersize?: number;
     rtscts?: number;
-    xon?: Boolean;
-    xoff?: Boolean;
-    xany?: Boolean;
+    xon?: boolean;
+    xoff?: boolean;
+    xany?: boolean;
 }
 
 

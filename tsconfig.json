@@ -3,11 +3,10 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "sourceMap": true,
-    "typeRoots": [ "node_modules/@types", "@types"],
+    "typeRoots": [ "node_modules/@types", "./@types"],
+    "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
     }
-  },
-  "include": [
-  ]
+  }
 }
