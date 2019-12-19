@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 /**
  * WebBlutooth example for Arduino Nano BLE 33
  *
@@ -6,69 +15,74 @@
  *
  * Please upload the sketch before running this code
  * chrome://flags/#enable-experimental-web-platform-features
+ *
+ * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 {
-    var msgRX_1 = "";
-    var stopRead_1 = false;
-    var decod_1 = new TextDecoder();
-    var btConnect = document.getElementById("btConnect");
-    var btStop = document.getElementById("btStop");
-    var pLog_1 = document.getElementById("pLog");
-    btConnect.addEventListener("click", function () {
-        // required for some reason, otherwise the port gets closed on the first attempt
-        navigator.serial.getPorts().then(function (serialPorts) {
-            console.log(serialPorts);
-        });
-        navigator.serial.requestPort().then(function (serialPort) {
-            serialPort.open({ baudrate: 9600 }).then(function open() {
-                log("Connected...");
-                var reader = serialPort.readable.getReader();
-                reader.read().then(function procdata(_a) {
-                    var done = _a.done, value = _a.value;
-                    if (done) {
-                        console.log("here4");
-                        return;
-                    }
-                    msgRX_1 = msgRX_1 + decod_1.decode(value);
-                    // bug !!!!!
-                    //sleep(100);
-                    // replace \r\n witch <br> for HTML display
-                    var strDisplay = msgRX_1.replace(/(?:\r\n|\r|\n)/g, "<br>");
-                    pLog_1.innerHTML = strDisplay.replace(/(?:\t)/g, "&nbsp&nbsp");
-                    if (!stopRead_1) {
-                        return reader.read().then(procdata);
-                    }
-                    else {
-                        reader.cancel().then(function () {
-                            serialPort.close();
-                            stopRead_1 = false;
-                            log("closed.");
-                            return;
-                        });
-                        return;
-                    }
-                }, function () {
-                    console.log("here5");
-                });
-                console.log("here1");
-            });
-            console.log("here2");
-        });
-        console.log("here3");
-        return;
+    let port;
+    let reader;
+    let stopRead = false;
+    const decod = new TextDecoder();
+    const btConnect = document.getElementById("btConnect");
+    const btStop = document.getElementById("btStop");
+    const pLog = document.getElementById("pLog");
+    btConnect.addEventListener("click", () => {
+        clickConnect();
+        console.log("here1 🍔");
     });
-    btStop.addEventListener("click", function () {
-        stopRead_1 = true;
+    btStop.addEventListener("click", () => {
+        stopRead = true;
     });
     function log(str) {
-        pLog_1.innerHTML = pLog_1.innerHTML + "<br>> " + str;
+        const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
+        const str2 = str1.replace(/(?:\t)/g, "&nbsp&nbsp");
+        pLog.innerHTML = pLog.innerHTML + str2;
     }
-}
-function sleep(milliseconds) {
-    var date = Date.now();
-    var currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
+    function sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+            currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+    }
+    function connect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // CODELAB: Add code to request & open port here.
+            // - Request a port and open a connection.
+            port = yield navigator.serial.requestPort();
+            // - Wait for the port to open.
+            yield port.open({ baudrate: 9600 });
+            // CODELAB: Add code to read the stream here.
+            const decoder = new TextDecoderStream();
+            const inputDone = port.readable.pipeTo(decoder.writable);
+            const inputStream = decoder.readable;
+            reader = inputStream.getReader();
+            readLoop();
+        });
+    }
+    function clickConnect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // CODELAB: Add connect code here.
+            yield connect();
+            console.log("here2 🥗");
+        });
+    }
+    function readLoop() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // CODELAB: Add read loop here.
+            while (true) {
+                const { value, done } = yield reader.read();
+                if (value) {
+                    log(value);
+                }
+                if (done) {
+                    console.log('[readLoop] DONE', done);
+                    reader.releaseLock();
+                    break;
+                }
+            }
+        });
+    }
+    // end of scope
 }
 //# sourceMappingURL=IMU-Text.js.map

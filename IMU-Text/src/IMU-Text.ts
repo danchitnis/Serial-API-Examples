@@ -6,12 +6,17 @@
  *
  * Please upload the sketch before running this code
  * chrome://flags/#enable-experimental-web-platform-features
+ * 
+ * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 
 
 {
 
- let msgRX = "";
+
+
+ let port: SerialPort;
+ let reader: ReadableStreamDefaultReader;
 
  let stopRead = false;
 
@@ -25,57 +30,9 @@
 
  btConnect.addEventListener("click", () => {
 
-    // required for some reason, otherwise the port gets closed on the first attempt
-    navigator.serial.getPorts().then( (serialPorts) => {
-        //console.log(serialPorts);
-    });
+    clickConnect();
+    console.log("here1 🍔");
 
-    navigator.serial.requestPort().then( (serialPort) => {
-        serialPort.open({baudrate: 9600}).then(function open() {
-
-            log("Connected...");
-
-            const reader = serialPort.readable.getReader();
-
-            reader.read().then(function procdata({done, value}): Promise<string> {
-                if (done) {
-                    console.log("here4");
-                    return;
-                }
-                msgRX = msgRX + decod.decode(value);
-
-                // bug !!!!!
-                //sleep(100);
-                
-
-                // replace \r\n witch <br> for HTML display
-                const strDisplay = msgRX.replace(/(?:\r\n|\r|\n)/g, "<br>");
-                pLog.innerHTML = strDisplay.replace(/(?:\t)/g, "&nbsp&nbsp");
-                
-                
-                if (!stopRead) {
-                    return reader.read().then(procdata);
-                    
-                    
-                } else {
-                    reader.cancel().then( () => {
-                        serialPort.close();
-                        stopRead = false;
-                        log("closed.");
-                        return;
-                    });
-                    return;
-                }
-            }, () => {
-                console.log("here5");
-            });
-            console.log("here1");
-            
-        });
-        console.log("here2");
-    });
-    console.log("here3");
-    return;
 
  });
 
@@ -88,10 +45,12 @@
  
 
  function log(str: string): void {
-    pLog.innerHTML = pLog.innerHTML + "<br>> " + str;
+    const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
+    const str2 = str1.replace(/(?:\t)/g, "&nbsp&nbsp");
+    pLog.innerHTML = pLog.innerHTML + str2;
  }
 
-}
+
 
 function sleep(milliseconds: number): void {
     const date = Date.now();
@@ -100,3 +59,44 @@ function sleep(milliseconds: number): void {
       currentDate = Date.now();
     } while (currentDate - date < milliseconds);
   }
+
+
+  async function connect(): Promise<void> {
+    // CODELAB: Add code to request & open port here.
+    // - Request a port and open a connection.
+    port = await navigator.serial.requestPort();
+    // - Wait for the port to open.
+    await port.open({ baudrate: 9600 });
+
+    // CODELAB: Add code to read the stream here.
+    const decoder = new TextDecoderStream();
+    const inputDone = port.readable.pipeTo(decoder.writable);
+    const inputStream = decoder.readable;
+
+    reader = inputStream.getReader();
+    readLoop();
+  }
+
+  async function clickConnect(): Promise<void> {
+    // CODELAB: Add connect code here.
+    await connect();
+    console.log("here2 🥗");
+  }
+
+  async function readLoop(): Promise<void> {
+      // CODELAB: Add read loop here.
+    while (true) {
+        const { value, done } = await reader.read();
+        if (value) {
+            log(value);
+        }
+        if (done) {
+            console.log('[readLoop] DONE', done);
+            reader.releaseLock();
+            break;
+        }
+    }
+  }
+
+// end of scope
+}
