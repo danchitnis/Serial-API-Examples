@@ -20,29 +20,38 @@
 
  let stopRead = false;
 
- const decod = new TextDecoder();
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
  const btStop = document.getElementById("btStop") as HTMLButtonElement;
 
  const pLog = document.getElementById("pLog") as HTMLParagraphElement;
 
+ log("Ready...\n");
 
  btConnect.addEventListener("click", () => {
-
+  
     clickConnect();
     console.log("here1 🍔");
-
 
  });
 
 
  btStop.addEventListener("click", () => {
-    stopRead = true;
+    clickDisconnect();
+  
+  
  });
 
 
- 
+ async function clickDisconnect(): Promise<void> {
+  if (port) {
+    if (reader) {
+      await reader.cancel();
+      await port.close();
+    }
+  }
+  log("\nport is closed now!\n");
+ }
 
  function log(str: string): void {
     const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -79,8 +88,14 @@ function sleep(milliseconds: number): void {
 
   async function clickConnect(): Promise<void> {
     // CODELAB: Add connect code here.
-    await connect();
-    console.log("here2 🥗");
+    try {
+      await connect();
+      console.log("here2 🥗");
+
+    } catch (error) {
+      log("Error 😢: " + error + "\n");
+    }
+    
   }
 
   async function readLoop(): Promise<void> {
@@ -96,6 +111,9 @@ function sleep(milliseconds: number): void {
             break;
         }
     }
+    //reader.cancel();
+    //port.close();
+    
   }
 
 // end of scope

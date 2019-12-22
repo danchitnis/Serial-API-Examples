@@ -22,17 +22,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     let port;
     let reader;
     let stopRead = false;
-    const decod = new TextDecoder();
     const btConnect = document.getElementById("btConnect");
     const btStop = document.getElementById("btStop");
     const pLog = document.getElementById("pLog");
+    log("Ready...\n");
     btConnect.addEventListener("click", () => {
         clickConnect();
         console.log("here1 🍔");
     });
     btStop.addEventListener("click", () => {
-        stopRead = true;
+        clickDisconnect();
     });
+    function clickDisconnect() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (port) {
+                if (reader) {
+                    yield reader.cancel();
+                    yield port.close();
+                }
+            }
+            log("\nport is closed now!\n");
+        });
+    }
     function log(str) {
         const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
         const str2 = str1.replace(/(?:\t)/g, "&nbsp&nbsp");
@@ -63,8 +74,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     function clickConnect() {
         return __awaiter(this, void 0, void 0, function* () {
             // CODELAB: Add connect code here.
-            yield connect();
-            console.log("here2 🥗");
+            try {
+                yield connect();
+                console.log("here2 🥗");
+            }
+            catch (error) {
+                log("Error 😢: " + error + "\n");
+            }
         });
     }
     function readLoop() {
@@ -77,10 +93,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 }
                 if (done) {
                     console.log('[readLoop] DONE', done);
-                    reader.releaseLock();
+                    //reader.releaseLock();
                     break;
                 }
             }
+            //reader.cancel();
+            //port.close();
         });
     }
     // end of scope
