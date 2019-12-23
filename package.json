@@ -13,7 +13,8 @@
   "scripts": {
     "build1": "tsc Counter/src/Counter.ts --outFile Counter/dist/Counter.js --sourceMap true --typeRoots @types",
     "build2": "tsc IMU-Text/src/IMU-Text.ts --outFile IMU-Text/dist/IMU-Text.js --sourceMap true --typeRoots @types --target ES2015",
-    "build": "npm run build1 && npm run build2",
+    "build3": "tsc IMU-Text-Plot/src/IMU-Text-Plot.ts --outFile IMU-Text-Plot/dist/IMU-Text-Plot.js --sourceMap true --typeRoots @types --target ES2015",
+    "build": "npm run build1 && npm run build2 && npm run build3",
     "ver": "tsc --version"
   },
   "repository": {

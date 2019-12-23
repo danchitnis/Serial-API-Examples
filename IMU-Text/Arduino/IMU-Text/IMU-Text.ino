@@ -18,6 +18,7 @@
 
 float x, y, z;
 bool LED = false;
+unsigned char counter = 0;
 
 
 void setup() {
@@ -44,11 +45,16 @@ void readIMU() {
   if (IMU.accelerationAvailable()) {
     IMU.readAcceleration(x, y, z);
 
+    Serial.print(counter);
+    Serial.print(":\t");
+
     Serial.print(x);
     Serial.print('\t');
     Serial.print(y);
     Serial.print('\t');
     Serial.println(z);
+
+    counter++;
   }
 }
 

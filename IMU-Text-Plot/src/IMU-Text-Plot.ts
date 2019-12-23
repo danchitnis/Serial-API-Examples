@@ -10,7 +10,6 @@
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 
-
 {
 
 
@@ -18,11 +17,14 @@
  let port: SerialPort;
  let reader: ReadableStreamDefaultReader;
 
+ 
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
  const btStop = document.getElementById("btStop") as HTMLButtonElement;
 
  const pLog = document.getElementById("pLog") as HTMLParagraphElement;
+
+ let strRX = "";
 
  log("Ready...\n");
 
@@ -102,6 +104,7 @@ function sleep(milliseconds: number): void {
         const { value, done } = await reader.read();
         if (value) {
             log(value);
+            procInput(value);
         }
         if (done) {
             console.log('[readLoop] DONE', done);
@@ -114,5 +117,46 @@ function sleep(milliseconds: number): void {
     
   }
 
+  function procInput(str: string): void {
+    strRX = strRX + str;
+    const linesRX = strRX.split("\n");
+    if (linesRX.length > 1) {
+      for (let i=0; i<linesRX.length-1; i++) {
+        
+
+        const dataStr = linesRX[i].split("\t");
+        const dataNum = dataStr.map(e => parseFloat(e));
+        
+        const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
+        //console.log(imu);
+        const event = new CustomEvent('rx',{detail:imu});
+        dispatchEvent(event);
+      }
+      // save the reminder of the input line
+      strRX = linesRX[ linesRX.length-1 ];
+    }
+      
+  }
+
+
+  this.addEventListener("rx", (event) => {
+    const e = event as CustomEvent<IMU>;
+    console.log(e.detail);
+  });
+
 // end of scope
+}
+
+class IMU {
+  counter: number;
+  x: number;
+  y: number;
+  z: number;
+
+  constructor(counter: number, x:number, y:number, z:number) {
+      this.counter = counter;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+  }
 }
