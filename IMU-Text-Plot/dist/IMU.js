@@ -1,18 +1,13 @@
 /**
- * 
+ *
  * Danial Chitnis
  */
-
 export class IMU {
-    counter: number;
-    x: number;
-    y: number;
-    z: number;
-
-    constructor(counter: number, x:number, y:number, z:number) {
+    constructor(counter, x, y, z) {
         this.counter = counter;
         this.x = x;
         this.y = y;
         this.z = z;
     }
- }
+}
+//# sourceMappingURL=IMU.js.map

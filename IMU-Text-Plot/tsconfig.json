@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "ES2015",
+    "target": "ES2017",
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "typeRoots": [ "../node_modules/@types", "../@types"],
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["../node_modules/*"]
+    }
+  }
+}

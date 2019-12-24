@@ -10,9 +10,10 @@
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 
+import {IMU} from "./IMU";
 {
 
-
+ 
 
  let port: SerialPort;
  let reader: ReadableStreamDefaultReader;
@@ -139,7 +140,7 @@ function sleep(milliseconds: number): void {
   }
 
 
-  this.addEventListener("rx", (event) => {
+  addEventListener("rx", (event) => {
     const e = event as CustomEvent<IMU>;
     console.log(e.detail);
   });
@@ -147,7 +148,7 @@ function sleep(milliseconds: number): void {
 // end of scope
 }
 
-class IMU {
+/*class IMU {
   counter: number;
   x: number;
   y: number;
@@ -159,4 +160,4 @@ class IMU {
       this.y = y;
       this.z = z;
   }
-}
+}*/

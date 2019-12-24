@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 /**
  * WebBlutooth example for Arduino Nano BLE 33
  *
@@ -18,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
  *
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
+import { IMU } from "./IMU";
 {
     let port;
     let reader;
@@ -33,16 +25,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     btStop.addEventListener("click", () => {
         clickDisconnect();
     });
-    function clickDisconnect() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (port) {
-                if (reader) {
-                    yield reader.cancel();
-                    yield port.close();
-                }
+    async function clickDisconnect() {
+        if (port) {
+            if (reader) {
+                await reader.cancel();
+                await port.close();
             }
-            log("\nport is closed now!\n");
-        });
+        }
+        log("\nport is closed now!\n");
     }
     function log(str) {
         const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -56,51 +46,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             currentDate = Date.now();
         } while (currentDate - date < milliseconds);
     }
-    function connect() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // CODELAB: Add code to request & open port here.
-            // - Request a port and open a connection.
-            port = yield navigator.serial.requestPort();
-            // - Wait for the port to open.
-            yield port.open({ baudrate: 9600 });
-            // CODELAB: Add code to read the stream here.
-            const decoder = new TextDecoderStream();
-            const inputDone = port.readable.pipeTo(decoder.writable);
-            const inputStream = decoder.readable;
-            reader = inputStream.getReader();
-            readLoop();
-        });
+    async function connect() {
+        // CODELAB: Add code to request & open port here.
+        // - Request a port and open a connection.
+        port = await navigator.serial.requestPort();
+        // - Wait for the port to open.
+        await port.open({ baudrate: 9600 });
+        // CODELAB: Add code to read the stream here.
+        const decoder = new TextDecoderStream();
+        const inputDone = port.readable.pipeTo(decoder.writable);
+        const inputStream = decoder.readable;
+        reader = inputStream.getReader();
+        readLoop();
     }
-    function clickConnect() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // CODELAB: Add connect code here.
-            try {
-                yield connect();
-                console.log("here2 🥗");
-            }
-            catch (error) {
-                log("Error 😢: " + error + "\n");
-            }
-        });
+    async function clickConnect() {
+        // CODELAB: Add connect code here.
+        try {
+            await connect();
+            console.log("here2 🥗");
+        }
+        catch (error) {
+            log("Error 😢: " + error + "\n");
+        }
     }
-    function readLoop() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // CODELAB: Add read loop here.
-            while (true) {
-                const { value, done } = yield reader.read();
-                if (value) {
-                    log(value);
-                    procInput(value);
-                }
-                if (done) {
-                    console.log('[readLoop] DONE', done);
-                    reader.releaseLock();
-                    break;
-                }
+    async function readLoop() {
+        // CODELAB: Add read loop here.
+        while (true) {
+            const { value, done } = await reader.read();
+            if (value) {
+                log(value);
+                procInput(value);
             }
-            //reader.cancel();
-            //port.close();
-        });
+            if (done) {
+                console.log('[readLoop] DONE', done);
+                reader.releaseLock();
+                break;
+            }
+        }
+        //reader.cancel();
+        //port.close();
     }
     function procInput(str) {
         strRX = strRX + str;
@@ -118,18 +102,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             strRX = linesRX[linesRX.length - 1];
         }
     }
-    this.addEventListener("rx", (event) => {
+    addEventListener("rx", (event) => {
         const e = event;
         console.log(e.detail);
     });
     // end of scope
 }
-class IMU {
-    constructor(counter, x, y, z) {
-        this.counter = counter;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-}
+/*class IMU {
+  counter: number;
+  x: number;
+  y: number;
+  z: number;
+
+  constructor(counter: number, x:number, y:number, z:number) {
+      this.counter = counter;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+  }
+}*/ 
 //# sourceMappingURL=IMU-Text-Plot.js.map
