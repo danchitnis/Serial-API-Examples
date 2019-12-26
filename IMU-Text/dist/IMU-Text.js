@@ -21,7 +21,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 {
     let port;
     let reader;
-    let stopRead = false;
     const btConnect = document.getElementById("btConnect");
     const btStop = document.getElementById("btStop");
     const pLog = document.getElementById("pLog");
@@ -93,7 +92,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 }
                 if (done) {
                     console.log('[readLoop] DONE', done);
-                    //reader.releaseLock();
+                    reader.releaseLock();
                     break;
                 }
             }

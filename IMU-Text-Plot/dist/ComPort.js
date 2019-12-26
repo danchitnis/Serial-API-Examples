@@ -4,10 +4,10 @@
  * Danial Chitnis
  */
 import { IMU } from "./IMU";
-export class ComPort {
+export class ComPort extends EventTarget {
     constructor() {
+        super();
         this.strRX = "";
-        //
     }
     async clickDisconnect() {
         if (this.port) {
@@ -68,7 +68,7 @@ export class ComPort {
                 const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
                 //console.log(imu);
                 const event = new CustomEvent('rx', { detail: imu });
-                dispatchEvent(event);
+                this.dispatchEvent(event);
             }
             // save the reminder of the input line
             this.strRX = linesRX[linesRX.length - 1];
@@ -76,7 +76,7 @@ export class ComPort {
     }
     log(str) {
         const event = new CustomEvent("rx-msg", { detail: str });
-        dispatchEvent(event);
+        this.dispatchEvent(event);
     }
 }
 //# sourceMappingURL=ComPort.js.map

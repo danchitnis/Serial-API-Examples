@@ -6,13 +6,16 @@
 
  import {IMU} from "./IMU";
 
- export class ComPort {
+ type RxEventType = "rx" | "rx-msg";
+
+ export class ComPort extends EventTarget {
     port: SerialPort;
     reader: ReadableStreamDefaultReader;
     strRX = "";
+    
 
     constructor() {
-        //
+        super();
     }
 
     async clickDisconnect(): Promise<void> {
@@ -84,7 +87,7 @@
             const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
             //console.log(imu);
             const event = new CustomEvent('rx',{detail:imu});
-            dispatchEvent(event);
+            this.dispatchEvent(event);
           }
           // save the reminder of the input line
           this.strRX = linesRX[ linesRX.length-1 ];
@@ -92,9 +95,10 @@
           
     }
 
-    log(str: string) {
+    log(str: string): void {
         const event = new CustomEvent("rx-msg",{detail:str});
-        dispatchEvent(event);
+        this.dispatchEvent(event);
     }
+
    
  }

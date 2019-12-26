@@ -1,4 +1,6 @@
 // rollup.config.js
+import resolve from '@rollup/plugin-node-resolve';
+
 const wdir = "./IMU-Text-Plot/";
 
 export default {
@@ -6,5 +8,6 @@ export default {
     output: {
       file: wdir + '/dist/bundle.js',
       format: 'iife'
-    }
+    },
+    plugins: [resolve()]
   };
