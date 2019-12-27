@@ -32,7 +32,7 @@ import {WebGLplot, WebglLine, ColorRGBA} from "webgl-plot";
 
 let lines: WebglLine[];
 const numLines = 3;
-const numX = 100;
+const numX = 1000;
 
 let wglp: WebGLplot;
 
@@ -119,15 +119,17 @@ function sleep(milliseconds: number): void {
 
   
 
-  function eventRxIMU(e: CustomEvent<IMU>): void {
+  function eventRxIMU(e: CustomEvent<string>): void {
     //console.log(e.detail);
-    lines[0].shiftAdd(new Float32Array([e.detail.x]) );
-    lines[1].shiftAdd(new Float32Array([e.detail.y]) );
-    lines[2].shiftAdd(new Float32Array([e.detail.z]) );
+    const imu = new IMU();
+    imu.extract(e.detail);
+    lines[0].shiftAdd(new Float32Array([imu.x]) );
+    lines[1].shiftAdd(new Float32Array([imu.y]) );
+    lines[2].shiftAdd(new Float32Array([imu.z]) );
   }
 
   function eventRxMsg(e: CustomEvent<string>): void {
-    log(e.detail);
+    //log(e.detail);
   }
 
 // end of scope

@@ -6,11 +6,17 @@
      * Danial Chitnis
      */
     class IMU {
-        constructor(counter, x, y, z) {
-            this.counter = counter;
-            this.x = x;
-            this.y = y;
-            this.z = z;
+        constructor() {
+            //
+        }
+        extract(strLine) {
+            const dataStr = strLine.split("\t");
+            const dataNum = dataStr.map(e => parseFloat(e));
+            this.counter = dataNum[0];
+            this.x = dataNum[1];
+            this.y = dataNum[2];
+            this.z = dataNum[3];
+            //console.log(imu);
         }
     }
 
@@ -38,7 +44,7 @@
             // - Request a port and open a connection.
             this.port = await navigator.serial.requestPort();
             // - Wait for the port to open.
-            await this.port.open({ baudrate: 9600 });
+            await this.port.open({ baudrate: 115200 });
             // CODELAB: Add code to read the stream here.
             const decoder = new TextDecoderStream();
             const inputDone = this.port.readable.pipeTo(decoder.writable);
@@ -78,11 +84,7 @@
             const linesRX = this.strRX.split("\n");
             if (linesRX.length > 1) {
                 for (let i = 0; i < linesRX.length - 1; i++) {
-                    const dataStr = linesRX[i].split("\t");
-                    const dataNum = dataStr.map(e => parseFloat(e));
-                    const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
-                    //console.log(imu);
-                    const event = new CustomEvent('rx', { detail: imu });
+                    const event = new CustomEvent('rx', { detail: linesRX[i] });
                     this.dispatchEvent(event);
                 }
                 // save the reminder of the input line
@@ -275,7 +277,7 @@
         const pLog = document.getElementById("pLog");
         let port;
         let lines;
-        const numX = 100;
+        const numX = 1000;
         let wglp;
         log("Ready...\n");
         init();
@@ -319,12 +321,14 @@
         }
         function eventRxIMU(e) {
             //console.log(e.detail);
-            lines[0].shiftAdd(new Float32Array([e.detail.x]));
-            lines[1].shiftAdd(new Float32Array([e.detail.y]));
-            lines[2].shiftAdd(new Float32Array([e.detail.z]));
+            const imu = new IMU();
+            imu.extract(e.detail);
+            lines[0].shiftAdd(new Float32Array([imu.x]));
+            lines[1].shiftAdd(new Float32Array([imu.y]));
+            lines[2].shiftAdd(new Float32Array([imu.z]));
         }
         function eventRxMsg(e) {
-            log(e.detail);
+            //log(e.detail);
         }
         // end of scope
     }

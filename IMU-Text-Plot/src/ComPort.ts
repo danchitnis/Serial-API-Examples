@@ -33,7 +33,7 @@
         // - Request a port and open a connection.
         this.port = await navigator.serial.requestPort();
         // - Wait for the port to open.
-        await this.port.open({ baudrate: 9600 });
+        await this.port.open({ baudrate: 115200 });
     
         // CODELAB: Add code to read the stream here.
         const decoder = new TextDecoderStream();
@@ -78,16 +78,12 @@
         this.strRX = this.strRX + str;
         const linesRX = this.strRX.split("\n");
         if (linesRX.length > 1) {
+          
           for (let i=0; i<linesRX.length-1; i++) {
             
-    
-            const dataStr = linesRX[i].split("\t");
-            const dataNum = dataStr.map(e => parseFloat(e));
-            
-            const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
-            //console.log(imu);
-            const event = new CustomEvent('rx',{detail:imu});
+            const event = new CustomEvent('rx',{detail: linesRX[i]});
             this.dispatchEvent(event);
+
           }
           // save the reminder of the input line
           this.strRX = linesRX[ linesRX.length-1 ];

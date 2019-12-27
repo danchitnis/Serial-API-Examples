@@ -3,7 +3,6 @@
  *
  * Danial Chitnis
  */
-import { IMU } from "./IMU";
 export class ComPort extends EventTarget {
     constructor() {
         super();
@@ -23,7 +22,7 @@ export class ComPort extends EventTarget {
         // - Request a port and open a connection.
         this.port = await navigator.serial.requestPort();
         // - Wait for the port to open.
-        await this.port.open({ baudrate: 9600 });
+        await this.port.open({ baudrate: 115200 });
         // CODELAB: Add code to read the stream here.
         const decoder = new TextDecoderStream();
         const inputDone = this.port.readable.pipeTo(decoder.writable);
@@ -63,11 +62,7 @@ export class ComPort extends EventTarget {
         const linesRX = this.strRX.split("\n");
         if (linesRX.length > 1) {
             for (let i = 0; i < linesRX.length - 1; i++) {
-                const dataStr = linesRX[i].split("\t");
-                const dataNum = dataStr.map(e => parseFloat(e));
-                const imu = new IMU(dataNum[0], dataNum[1], dataNum[2], dataNum[3]);
-                //console.log(imu);
-                const event = new CustomEvent('rx', { detail: imu });
+                const event = new CustomEvent('rx', { detail: linesRX[i] });
                 this.dispatchEvent(event);
             }
             // save the reminder of the input line

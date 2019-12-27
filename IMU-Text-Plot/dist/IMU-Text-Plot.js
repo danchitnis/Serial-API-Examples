@@ -9,6 +9,7 @@
  *
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
+import { IMU } from "./IMU";
 import { ComPort } from "./ComPort";
 import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
 {
@@ -19,7 +20,7 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
     let port;
     let lines;
     const numLines = 3;
-    const numX = 100;
+    const numX = 1000;
     let wglp;
     log("Ready...\n");
     init();
@@ -72,12 +73,14 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
     }
     function eventRxIMU(e) {
         //console.log(e.detail);
-        lines[0].shiftAdd(new Float32Array([e.detail.x]));
-        lines[1].shiftAdd(new Float32Array([e.detail.y]));
-        lines[2].shiftAdd(new Float32Array([e.detail.z]));
+        const imu = new IMU();
+        imu.extract(e.detail);
+        lines[0].shiftAdd(new Float32Array([imu.x]));
+        lines[1].shiftAdd(new Float32Array([imu.y]));
+        lines[2].shiftAdd(new Float32Array([imu.z]));
     }
     function eventRxMsg(e) {
-        log(e.detail);
+        //log(e.detail);
     }
     // end of scope
 }
