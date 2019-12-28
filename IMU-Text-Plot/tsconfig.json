@@ -6,10 +6,15 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "typeRoots": [ "../node_modules/@types", "../@types"],
-    "outDir": "./dist",
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
       "*": ["../node_modules/*"]
     }
-  }
+  },
+  "include": [
+    "src/**/*",
+    //"node_modules/webgl-plot/dist/*",
+    //"src/webglplot/*"
+  ]
 }

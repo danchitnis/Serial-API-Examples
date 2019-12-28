@@ -10,7 +10,7 @@
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 import { IMU } from "./IMU";
-import { ComPort } from "./ComPort";
+import { ComPort } from "../../ComPort/src/ComPort";
 import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
 {
     const btConnect = document.getElementById("btConnect");
@@ -19,29 +19,30 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
     const pLog = document.getElementById("pLog");
     let port;
     let lines;
-    const numLines = 3;
     const numX = 1000;
     let wglp;
     log("Ready...\n");
     init();
     btConnect.addEventListener("click", () => {
         port = new ComPort();
-        port.clickConnect();
+        port.connect(115200);
         port.addEventListener("rx-msg", eventRxMsg);
         port.addEventListener("rx", eventRxIMU);
         console.log("here1 🍔");
+        //start animation
+        window.requestAnimationFrame(newFrame);
     });
     btStop.addEventListener("click", () => {
-        port.clickDisconnect();
+        port.disconnect();
     });
     function newFrame() {
-        //update();
-        //wglp.scaleY = scaleY;
+        update();
+        wglp.scaleY = 0.9;
         wglp.update();
         window.requestAnimationFrame(newFrame);
     }
-    window.requestAnimationFrame(newFrame);
     function update() {
+        //nothing to do
     }
     function init() {
         lines = [];
@@ -51,13 +52,10 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
         wglp = new WebGLplot(canvas, new ColorRGBA(0.1, 0.1, 0.1, 1));
         lines.forEach((line) => {
             wglp.addLine(line);
-        });
-        for (let i = 0; i < numX; i++) {
             // set x to -num/2:1:+num/2
-            lines.forEach((line) => {
-                line.linespaceX(-1, 2 / numX);
-            });
-        }
+            line.linespaceX(-1, 2 / numX);
+        });
+        wglp.update();
     }
     function log(str) {
         const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -80,7 +78,7 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
         lines[2].shiftAdd(new Float32Array([imu.z]));
     }
     function eventRxMsg(e) {
-        //log(e.detail);
+        log(e.detail + "\n");
     }
     // end of scope
 }

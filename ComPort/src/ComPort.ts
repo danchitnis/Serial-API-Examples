@@ -4,8 +4,6 @@
  * Danial Chitnis
  */
 
- import {IMU} from "./IMU";
-
  type RxEventType = "rx" | "rx-msg";
 
  export class ComPort extends EventTarget {
@@ -18,7 +16,7 @@
         super();
     }
 
-    async clickDisconnect(): Promise<void> {
+    async disconnect(): Promise<void> {
         if (this.port) {
           if (this.reader) {
             await this.reader.cancel();
@@ -28,12 +26,16 @@
         this.log("\nport is closed now!\n");
     }
 
-    async connect(): Promise<void> {
+    async connectSerialApi(baudrate: Baudrate): Promise<void> {
         // CODELAB: Add code to request & open port here.
         // - Request a port and open a connection.
+        this.log("Requesting port");
         this.port = await navigator.serial.requestPort();
         // - Wait for the port to open.
-        await this.port.open({ baudrate: 115200 });
+        this.log("Openning port");
+        await this.port.open({ baudrate: baudrate });
+
+        this.log("Port is now open 🎉");
     
         // CODELAB: Add code to read the stream here.
         const decoder = new TextDecoderStream();
@@ -44,10 +46,10 @@
         this.readLoop();
     }
 
-    async clickConnect(): Promise<void> {
+    async connect(baudrate: Baudrate): Promise<void> {
         // CODELAB: Add connect code here.
         try {
-          await this.connect();
+          await this.connectSerialApi(baudrate);
           console.log("here2 🥗");
     
         } catch (error) {
@@ -56,12 +58,11 @@
         
     }
     
-    async readLoop(): Promise<void> {
+    private async readLoop(): Promise<void> {
           // CODELAB: Add read loop here.
         while (true) {
             const { value, done } = await this.reader.read();
             if (value) {
-                this.log(value);
                 this.procInput(value);
             }
             if (done) {
@@ -74,7 +75,7 @@
         //port.close();
     }
 
-    procInput(str: string): void {
+    private procInput(str: string): void {
         this.strRX = this.strRX + str;
         const linesRX = this.strRX.split("\n");
         if (linesRX.length > 1) {
@@ -91,7 +92,7 @@
           
     }
 
-    log(str: string): void {
+    private log(str: string): void {
         const event = new CustomEvent("rx-msg",{detail:str});
         this.dispatchEvent(event);
     }

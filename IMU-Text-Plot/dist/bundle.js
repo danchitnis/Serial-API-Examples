@@ -30,7 +30,7 @@
             super();
             this.strRX = "";
         }
-        async clickDisconnect() {
+        async disconnect() {
             if (this.port) {
                 if (this.reader) {
                     await this.reader.cancel();
@@ -39,12 +39,15 @@
             }
             this.log("\nport is closed now!\n");
         }
-        async connect() {
+        async connectSerialApi(baudrate) {
             // CODELAB: Add code to request & open port here.
             // - Request a port and open a connection.
+            this.log("Requesting port");
             this.port = await navigator.serial.requestPort();
             // - Wait for the port to open.
-            await this.port.open({ baudrate: 115200 });
+            this.log("Openning port");
+            await this.port.open({ baudrate: baudrate });
+            this.log("Port is now open 🎉");
             // CODELAB: Add code to read the stream here.
             const decoder = new TextDecoderStream();
             const inputDone = this.port.readable.pipeTo(decoder.writable);
@@ -52,10 +55,10 @@
             this.reader = inputStream.getReader();
             this.readLoop();
         }
-        async clickConnect() {
+        async connect(baudrate) {
             // CODELAB: Add connect code here.
             try {
-                await this.connect();
+                await this.connectSerialApi(baudrate);
                 console.log("here2 🥗");
             }
             catch (error) {
@@ -67,7 +70,6 @@
             while (true) {
                 const { value, done } = await this.reader.read();
                 if (value) {
-                    this.log(value);
                     this.procInput(value);
                 }
                 if (done) {
@@ -283,21 +285,21 @@
         init();
         btConnect.addEventListener("click", () => {
             port = new ComPort();
-            port.clickConnect();
+            port.connect(115200);
             port.addEventListener("rx-msg", eventRxMsg);
             port.addEventListener("rx", eventRxIMU);
             console.log("here1 🍔");
+            //start animation
+            window.requestAnimationFrame(newFrame);
         });
         btStop.addEventListener("click", () => {
-            port.clickDisconnect();
+            port.disconnect();
         });
         function newFrame() {
-            //update();
-            //wglp.scaleY = scaleY;
+            wglp.scaleY = 0.9;
             wglp.update();
             window.requestAnimationFrame(newFrame);
         }
-        window.requestAnimationFrame(newFrame);
         function init() {
             lines = [];
             lines.push(new WebglLine(new ColorRGBA(1, 0, 0, 0.5), numX));
@@ -306,13 +308,10 @@
             wglp = new WebGLplot(canvas, new ColorRGBA(0.1, 0.1, 0.1, 1));
             lines.forEach((line) => {
                 wglp.addLine(line);
-            });
-            for (let i = 0; i < numX; i++) {
                 // set x to -num/2:1:+num/2
-                lines.forEach((line) => {
-                    line.linespaceX(-1, 2 / numX);
-                });
-            }
+                line.linespaceX(-1, 2 / numX);
+            });
+            wglp.update();
         }
         function log(str) {
             const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -328,7 +327,7 @@
             lines[2].shiftAdd(new Float32Array([imu.z]));
         }
         function eventRxMsg(e) {
-            //log(e.detail);
+            log(e.detail + "\n");
         }
         // end of scope
     }

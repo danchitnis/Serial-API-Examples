@@ -16,9 +16,11 @@
 
 #include <Arduino_LSM9DS1.h>
 
-float x, y, z;
+float x = 0, y = 0, z = 0;
 bool LED = false;
-unsigned char counter = 0;
+unsigned char counter_packet = 0;
+unsigned char counetr_accum = 0;
+const unsigned char Naccum = 1;
 
 
 void setup() {
@@ -37,25 +39,36 @@ void loop() {
   
   readIMU();
   toggleLED();
-  wait_ms(10);
+  //wait_ms(10);
 }
 
 
 void readIMU() {
+
   if (IMU.accelerationAvailable()) {
     IMU.readAcceleration(x, y, z);
-
-    Serial.print(counter);
-    Serial.print(":\t");
-
-    Serial.print(x);
-    Serial.print('\t');
-    Serial.print(y);
-    Serial.print('\t');
-    Serial.println(z);
-
-    counter++;
+    
+    if (counetr_accum == Naccum) {
+      counetr_accum = 0;
+      sendData();
+      
+    } else {
+      counetr_accum++;
+    }
   }
+}
+
+void sendData() {
+  Serial.print(counter_packet);
+  Serial.print(":\t");
+
+  Serial.print(x);
+  Serial.print('\t');
+  Serial.print(y);
+  Serial.print('\t');
+  Serial.println(z);
+
+  counter_packet++;
 }
 
 int toggleLED() {

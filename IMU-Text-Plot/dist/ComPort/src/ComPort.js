@@ -8,7 +8,7 @@ export class ComPort extends EventTarget {
         super();
         this.strRX = "";
     }
-    async clickDisconnect() {
+    async disconnect() {
         if (this.port) {
             if (this.reader) {
                 await this.reader.cancel();
@@ -17,12 +17,15 @@ export class ComPort extends EventTarget {
         }
         this.log("\nport is closed now!\n");
     }
-    async connect() {
+    async connectSerialApi(baudrate) {
         // CODELAB: Add code to request & open port here.
         // - Request a port and open a connection.
+        this.log("Requesting port");
         this.port = await navigator.serial.requestPort();
         // - Wait for the port to open.
-        await this.port.open({ baudrate: 115200 });
+        this.log("Openning port");
+        await this.port.open({ baudrate: baudrate });
+        this.log("Port is now open 🎉");
         // CODELAB: Add code to read the stream here.
         const decoder = new TextDecoderStream();
         const inputDone = this.port.readable.pipeTo(decoder.writable);
@@ -30,10 +33,10 @@ export class ComPort extends EventTarget {
         this.reader = inputStream.getReader();
         this.readLoop();
     }
-    async clickConnect() {
+    async connect(baudrate) {
         // CODELAB: Add connect code here.
         try {
-            await this.connect();
+            await this.connectSerialApi(baudrate);
             console.log("here2 🥗");
         }
         catch (error) {
@@ -45,7 +48,6 @@ export class ComPort extends EventTarget {
         while (true) {
             const { value, done } = await this.reader.read();
             if (value) {
-                this.log(value);
                 this.procInput(value);
             }
             if (done) {

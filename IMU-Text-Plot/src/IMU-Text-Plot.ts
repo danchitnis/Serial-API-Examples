@@ -11,14 +11,10 @@
  */
 
 import {IMU} from "./IMU";
-import {ComPort} from "./ComPort";
+import {ComPort} from "../../ComPort/src/ComPort";
 import {WebGLplot, WebglLine, ColorRGBA} from "webgl-plot";
 
 {
-
- 
-
- 
  
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
@@ -31,7 +27,7 @@ import {WebGLplot, WebglLine, ColorRGBA} from "webgl-plot";
  let port: ComPort;
 
 let lines: WebglLine[];
-const numLines = 3;
+
 const numX = 1000;
 
 let wglp: WebGLplot;
@@ -44,39 +40,39 @@ let wglp: WebGLplot;
 
  btConnect.addEventListener("click", () => {
     port = new ComPort();
-    port.clickConnect();
+    port.connect(115200);
     port.addEventListener("rx-msg", eventRxMsg);
     port.addEventListener("rx", eventRxIMU );
     console.log("here1 🍔");
+    
+    //start animation
+    window.requestAnimationFrame(newFrame);
 
  });
 
-
  btStop.addEventListener("click", () => {
-    port.clickDisconnect();
+    port.disconnect();
   
   
  });
 
  function newFrame(): void {
 
-  //update();
-  //wglp.scaleY = scaleY;
+  update();
+  wglp.scaleY = 0.9;
   wglp.update();
-
+  
   window.requestAnimationFrame(newFrame);
-}
+ }
 
-window.requestAnimationFrame(newFrame);
+ 
 
  function update(): void {
-   
-
+   //nothing to do
  }
 
  function init(): void {
   lines = [];
-
   
   lines.push(new WebglLine(new ColorRGBA(1, 0, 0, 0.5), numX));
   lines.push(new WebglLine(new ColorRGBA(0, 1, 0, 0.5), numX));
@@ -87,17 +83,11 @@ window.requestAnimationFrame(newFrame);
 
   lines.forEach((line) => {
     wglp.addLine(line);
-  });
-
-  for (let i = 0; i < numX; i++) {
     // set x to -num/2:1:+num/2
-    lines.forEach((line) => {
-      line.linespaceX(-1, 2  / numX);
-    });
-  }
+    line.linespaceX(-1, 2  / numX);
+  });
+  wglp.update();
  }
-
-
  
 
  function log(str: string): void {
@@ -129,7 +119,7 @@ function sleep(milliseconds: number): void {
   }
 
   function eventRxMsg(e: CustomEvent<string>): void {
-    //log(e.detail);
+    log(e.detail + "\n");
   }
 
 // end of scope
