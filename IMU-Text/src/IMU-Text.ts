@@ -10,13 +10,13 @@
  * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 
-
+import {ComPort} from "../../ComPort/src/ComPort"
 {
 
 
 
- let port: SerialPort;
- let reader: ReadableStreamDefaultReader;
+ let port: ComPort;
+ 
 
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
@@ -27,29 +27,24 @@
  log("Ready...\n");
 
  btConnect.addEventListener("click", () => {
-  
-    clickConnect();
+    port  = new ComPort();
+    port.connect(9600);
+    port.addEventListener("rx", dataRX);
+    port.addEventListener("rx-msg", dataRX);
+    
     console.log("here1 🍔");
 
  });
 
 
  btStop.addEventListener("click", () => {
-    clickDisconnect();
+    //implement???
   
   
  });
 
 
- async function clickDisconnect(): Promise<void> {
-  if (port) {
-    if (reader) {
-      await reader.cancel();
-      await port.close();
-    }
-  }
-  log("\nport is closed now!\n");
- }
+ 
 
  function log(str: string): void {
     const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
@@ -59,7 +54,7 @@
 
 
 
-function sleep(milliseconds: number): void {
+ function sleep(milliseconds: number): void {
     const date = Date.now();
     let currentDate = null;
     do {
@@ -68,50 +63,8 @@ function sleep(milliseconds: number): void {
   }
 
 
-  async function connect(): Promise<void> {
-    // CODELAB: Add code to request & open port here.
-    // - Request a port and open a connection.
-    port = await navigator.serial.requestPort();
-    // - Wait for the port to open.
-    await port.open({ baudrate: 9600 });
-
-    // CODELAB: Add code to read the stream here.
-    const decoder = new TextDecoderStream();
-    const inputDone = port.readable.pipeTo(decoder.writable);
-    const inputStream = decoder.readable;
-
-    reader = inputStream.getReader();
-    readLoop();
-  }
-
-  async function clickConnect(): Promise<void> {
-    // CODELAB: Add connect code here.
-    try {
-      await connect();
-      console.log("here2 🥗");
-
-    } catch (error) {
-      log("Error 😢: " + error + "\n");
-    }
-    
-  }
-
-  async function readLoop(): Promise<void> {
-      // CODELAB: Add read loop here.
-    while (true) {
-        const { value, done } = await reader.read();
-        if (value) {
-            log(value);
-        }
-        if (done) {
-            console.log('[readLoop] DONE', done);
-            reader.releaseLock();
-            break;
-        }
-    }
-    //reader.cancel();
-    //port.close();
-    
+  function dataRX(e: CustomEvent<string>): void {
+    log(e.detail + "\n");
   }
 
 // end of scope
