@@ -6,73 +6,58 @@
  *
  * Please upload the sketch before running this code
  * chrome://flags/#enable-experimental-web-platform-features
+ * 
+ * https://codelabs.developers.google.com/codelabs/web-serial/#3
  */
 
-
+import {ComPort} from "../../ComPort/src/ComPort"
 {
 
- let msgRX = "";
 
- let stopRead = false;
 
- const decod = new TextDecoder();
+ let port: ComPort;
+ 
+
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
  const btStop = document.getElementById("btStop") as HTMLButtonElement;
 
  const pLog = document.getElementById("pLog") as HTMLParagraphElement;
 
+ log("Ready...\n");
 
  btConnect.addEventListener("click", () => {
-
-    // not implemnetd yet
-    /*navigator.serial.getPorts().then( (serialPorts) => {
-        console.log(serialPorts);
-    });*/
-
-    navigator.serial.requestPort().then( (serialPort) => {
-        serialPort.open({baudrate: 9600}).then( () => {
-
-            log("Connected...");
-
-            const reader = serialPort.readable.getReader();
-
-            reader.read().then(function procdata({done, value}): Promise<string> {
-                if (done) {
-                    return;
-                }
-                msgRX = msgRX + decod.decode(value);
-
-                // replace \r\n witch <br> for HTML display
-                pLog.innerHTML = msgRX.replace(/(?:\r\n|\r|\n)/g, "<br>");
-
-                if (!stopRead) {
-                    return reader.read().then(procdata);
-                } else {
-                    reader.cancel().then( () => {
-                        serialPort.close();
-                        stopRead = false;
-                        log("closed.");
-                        return;
-                    });
-                    return;
-                }
-            });
-        });
-    });
+    
+    port  = new ComPort();
+    port.connect(9600);
+    port.addEventListener("rx", dataRX);
+    port.addEventListener("rx-msg", dataRX);
+    
+    console.log("here1 🍔");
 
  });
 
 
  btStop.addEventListener("click", () => {
-    stopRead = true;
+
+    port.disconnect();
+
+  
  });
 
 
- 
-
  function log(str: string): void {
-    pLog.innerHTML = pLog.innerHTML + "<br>> " + str;
+    const str1 = str.replace(/(?:\r\n|\r|\n)/g, "<br>");
+    const str2 = str1.replace(/(?:\t)/g, "&nbsp&nbsp");
+    pLog.innerHTML = pLog.innerHTML + str2;
  }
 
+
+
+
+  function dataRX(e: CustomEvent<string>): void {
+    log(e.detail + "\n");
+  }
+
+// end of scope
 }

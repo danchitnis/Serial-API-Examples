@@ -15,7 +15,7 @@
     "typescript": "^3.7.4"
   },
   "scripts": {
-    "build1": "tsc Counter/src/Counter.ts --outFile Counter/dist/Counter.js --sourceMap true --typeRoots @types",
+    "build1": "tsc -p ./Counter && rollup --config ./Counter/rollup.config.js",
     "build2": "tsc -p ./IMU-Text && rollup --config ./IMU-Text/rollup.config.js",
     "build3": "tsc -p ./IMU-Text-Plot && rollup --config ./IMU-Text-Plot/rollup.config.js",
     "build": "npm run build1 && npm run build2 && npm run build3",

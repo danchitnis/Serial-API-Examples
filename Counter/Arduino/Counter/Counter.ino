@@ -18,18 +18,22 @@ unsigned char counter = 0;
 
 void setup() {
   Serial.begin(9600);
-  while (!Serial);
+  // Don't wait for serial connection
+  //while (!Serial);
   Serial.println("Started...");
-
 
 }
 
 void loop() {
   
-  if (counter<5) {
+  while(true) {
+    Serial.print(counter);
+    Serial.print(": The counter value is ");
     Serial.println(counter);
+    
+    counter++;
+    wait_ms(1000);
   }
   
-  counter++;
-  wait_ms(1000);
+  
 }
