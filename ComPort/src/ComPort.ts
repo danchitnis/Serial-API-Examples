@@ -1,7 +1,8 @@
 /**
+ * This code is inspired by Googles Serial Api example
+ * https://codelabs.developers.google.com/codelabs/web-serial/
  * 
- * 
- * Danial Chitnis
+ * Danial Chitnis 2020
  */
 
  type RxEventType = "rx" | "rx-msg";
@@ -9,6 +10,9 @@
  export class ComPort extends EventTarget {
     port: SerialPort;
     private reader: ReadableStreamDefaultReader;
+    private outputStream: WritableStream<string>;
+    private inputDone: Promise<void>;
+    private outputDone: Promise<void>;
     private strRX = "";
     
 
@@ -19,34 +23,48 @@
     async disconnect(): Promise<void> {
         if (this.port) {
           if (this.reader) {
-            await this.reader.cancel().catch(e => console.log('Error: ', e.message));
-            this.port.close();
+            await this.reader.cancel();
+            await this.inputDone.catch((e) => {console.log(e);});
+            this.reader = null;
+            this.inputDone = null;
           }
-            
+          if (this.outputStream) {
+            await this.outputStream.getWriter().close();
+            await this.outputDone.catch((e) => {console.log(e);});
+            this.outputStream = null;
+            this.outputDone = null;
+          }
+          await this.port.close();
+          this.log("\nport is now closed!\n");
         }
-        this.log("\nport is closed now!\n");
+        
     }
 
     private async connectSerialApi(baudrate: Baudrate): Promise<void> {
-        // CODELAB: Add code to request & open port here.
-        // - Request a port and open a connection.
-        this.log("Requesting port");
-        this.port = await navigator.serial.requestPort();
+      // CODELAB: Add code to request & open port here.
+      // - Request a port and open a connection.
+      this.log("Requesting port");
+      this.port = await navigator.serial.requestPort();
 
-        // - Wait for the port to open.
-        this.log("Openning port");
-        await this.port.open({ baudrate: baudrate });
+      // - Wait for the port to open.
+      this.log("Openning port");
+      await this.port.open({ baudrate: baudrate });
 
-        this.log("Port is now open 🎉");
-    
-        // CODELAB: Add code to read the stream here.
-        const decoder = new TextDecoderStream();
-        const inputDone = this.port.readable.pipeTo(decoder.writable);
-        const inputStream = decoder.readable;
-    
-        this.reader = inputStream.getReader();
-        this.readLoop();
+      this.log("Port is now open 🎉");
+  
+      // CODELAB: Add code to read the stream here.
+      const decoder = new TextDecoderStream();
+      this.inputDone = this.port.readable.pipeTo(decoder.writable);
+      const inputStream = decoder.readable;
+
+      const encoder = new TextEncoderStream();
+      this.outputDone = encoder.readable.pipeTo(this.port.writable);
+      this.outputStream = encoder.writable;
+  
+      this.reader = inputStream.getReader();
+      this.readLoop();
     }
+
 
     async connect(baudrate: Baudrate): Promise<void> {
         // CODELAB: Add connect code here.
@@ -110,5 +128,17 @@
       super.addEventListener(eventType, listener);
     }
 
+
+    private async writeToStream(line: string): Promise<void> {
+      // CODELAB: Write to output stream
+      const writer = this.outputStream.getWriter();
+      //console.log('[SEND]', line);
+      await writer.write(line + '\n');
+      writer.releaseLock();
+    }
+
+    sendLine(line: string): void {
+      this.writeToStream(line);
+    }
    
  }

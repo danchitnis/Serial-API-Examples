@@ -23,7 +23,9 @@ import {ComPort} from "../../ComPort/src/ComPort"
 
  const btConnect = document.getElementById("btConnect") as HTMLButtonElement;
  const btStop = document.getElementById("btStop") as HTMLButtonElement;
+ const btSend = document.getElementById("btSend") as HTMLButtonElement;
 
+ const inText = document.getElementById("inputText") as HTMLInputElement;
  const pLog = document.getElementById("pLog") as HTMLParagraphElement;
 
  log("Ready...\n");
@@ -36,16 +38,30 @@ import {ComPort} from "../../ComPort/src/ComPort"
     port.addEventListener("rx-msg", dataRX);
     
     console.log("here1 🍔");
+    
 
  });
 
 
  btStop.addEventListener("click", () => {
 
-    port.disconnect();
-
-  
+   port.disconnect();
  });
+
+ btSend.addEventListener("click", () => {
+   sendLine();
+ });
+
+ inText.addEventListener("keyup", (e) => {
+   if (e.keyCode === 13) {
+      sendLine();
+   }
+ });
+
+ function sendLine(): void {
+   port.sendLine(inText.value);
+   inText.value =  "";
+ } 
 
 
  function log(str: string): void {
