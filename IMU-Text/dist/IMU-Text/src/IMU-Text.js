@@ -20,7 +20,7 @@ import { ComPort } from "../../ComPort/src/ComPort";
         port = new ComPort();
         port.connect(9600);
         port.addEventListener("rx", dataRX);
-        port.addEventListener("rx-msg", dataRX);
+        port.addEventListener("log", dataRX);
         console.log("here1 🍔");
     });
     btStop.addEventListener("click", () => {

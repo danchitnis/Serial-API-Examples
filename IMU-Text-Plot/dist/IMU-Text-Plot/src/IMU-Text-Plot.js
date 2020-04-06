@@ -26,7 +26,7 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
     btConnect.addEventListener("click", () => {
         port = new ComPort();
         port.connect(115200);
-        port.addEventListener("rx-msg", eventRxMsg);
+        port.addEventListener("log", eventRxMsg);
         port.addEventListener("rx", eventRxIMU);
         console.log("here1 🍔");
         //start animation
@@ -37,7 +37,7 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
     });
     function newFrame() {
         update();
-        wglp.scaleY = 0.9;
+        wglp.gScaleY = 0.9;
         wglp.update();
         window.requestAnimationFrame(newFrame);
     }
@@ -49,7 +49,7 @@ import { WebGLplot, WebglLine, ColorRGBA } from "webgl-plot";
         lines.push(new WebglLine(new ColorRGBA(1, 0, 0, 0.5), numX));
         lines.push(new WebglLine(new ColorRGBA(0, 1, 0, 0.5), numX));
         lines.push(new WebglLine(new ColorRGBA(0, 0, 1, 0.5), numX));
-        wglp = new WebGLplot(canvas, new ColorRGBA(0.1, 0.1, 0.1, 1));
+        wglp = new WebGLplot(canvas);
         lines.forEach((line) => {
             wglp.addLine(line);
             // set x to -num/2:1:+num/2

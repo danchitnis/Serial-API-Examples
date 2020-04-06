@@ -4,23 +4,23 @@
   "description": "Using the IMU 9-axis sensor to plot on webgl-plot",
   "main": "index.js",
   "dependencies": {
-    "@danchitnis/comport": "^0.1.1",
-    "webgl-plot": "^0.2.3"
+    "@danchitnis/comport": "^0.1.2",
+    "webgl-plot": "^0.2.9"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^6.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.13.0",
-    "@typescript-eslint/parser": "^2.13.0",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
     "eslint": "^6.8.0",
-    "rollup": "^1.27.14",
-    "typescript": "^3.7.4"
+    "rollup": "^2.3.3",
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "build1": "tsc -p ./Counter && rollup --config ./Counter/rollup.config.js",
     "build2": "tsc -p ./IMU-Text && rollup --config ./IMU-Text/rollup.config.js",
     "build3": "tsc -p ./IMU-Text-Plot && rollup --config ./IMU-Text-Plot/rollup.config.js",
     "build4": "tsc -p ./Echo && rollup --config ./Echo/rollup.config.js",
-    "build": "npm run build1 && npm run build2 && npm run build3",
+    "build": "yarn run build1 && yarn run build2 && yarn run build3 && yarn run build4",
     "ver": "tsc --version"
   },
   "repository": {

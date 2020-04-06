@@ -1,15 +1,22 @@
 (function () {
     'use strict';
 
-    /**
+    /*
+     * This code is inspired by Googles Serial Api example
+     * https://codelabs.developers.google.com/codelabs/web-serial/
      *
-     *
-     * Danial Chitnis
+     * Danial Chitnis 2020
      */
-    class ComPort extends EventTarget {
+    /**
+     *  The main class for ComPort package
+     */
+    class ComPort {
+        /**
+         * creates a ComPort object
+         */
         constructor() {
-            super();
             this.strRX = "";
+            this.comEvent = new EventTarget();
         }
         async disconnect() {
             if (this.port) {
@@ -32,12 +39,11 @@
         async connectSerialApi(baudrate) {
             // CODELAB: Add code to request & open port here.
             // - Request a port and open a connection.
-            this.log("Requesting port");
+            this.log("Requesting port...");
             this.port = await navigator.serial.requestPort();
             // - Wait for the port to open.
-            this.log("Openning port");
+            this.log("Openning port...");
             await this.port.open({ baudrate: baudrate });
-            this.log("Port is now open 🎉");
             // CODELAB: Add code to read the stream here.
             const decoder = new TextDecoderStream();
             this.inputDone = this.port.readable.pipeTo(decoder.writable);
@@ -48,18 +54,26 @@
             this.reader = inputStream.getReader();
             this.readLoop();
         }
-        async connect(baudrate) {
+        async connectToPort(baudrate) {
             // CODELAB: Add connect code here.
             try {
                 await this.connectSerialApi(baudrate);
-                console.log("here2 🥗");
+                this.log("Port is now open 🎉");
             }
             catch (error) {
                 this.log("Error 😢: " + error + "\n");
             }
         }
+        /**
+         * Connect to the serial port. This will open the request user dialog box.
+         * @param baudrate : speed of connection e.g. 9600 or 115200
+         */
+        connect(baudrate) {
+            this.connectToPort(baudrate);
+        }
         async readLoop() {
             // CODELAB: Add read loop here.
+            // eslint-disable-next-line no-constant-condition
             while (true) {
                 try {
                     const { value, done } = await this.reader.read();
@@ -90,11 +104,22 @@
             }
         }
         log(str) {
-            const event = new CustomEvent("rx-msg", { detail: str });
+            const event = new CustomEvent("log", { detail: str });
             this.dispatchEvent(event);
         }
+        /**
+         * Adds a event listnere type for ComPort
+         * @param eventType either two types of event rx or rx-msg
+         * @param listener a function callback for CustomEvent
+         */
         addEventListener(eventType, listener) {
-            super.addEventListener(eventType, listener);
+            this.comEvent.addEventListener(eventType, listener);
+        }
+        removeEventListener() {
+            //
+        }
+        dispatchEvent(event) {
+            return this.comEvent.dispatchEvent(event);
         }
         async writeToStream(line) {
             // CODELAB: Write to output stream
@@ -103,6 +128,10 @@
             await writer.write(line + '\n');
             writer.releaseLock();
         }
+        /**
+         * Send a line of String
+         * @param line : a line of string. The \n character will be added to end of the line
+         */
         sendLine(line) {
             this.writeToStream(line);
         }
@@ -132,7 +161,7 @@
             port = new ComPort();
             port.connect(9600);
             port.addEventListener("rx", dataRX);
-            port.addEventListener("rx-msg", dataRX);
+            port.addEventListener("log", dataRX);
             console.log("here1 🍔");
         });
         btStop.addEventListener("click", () => {
